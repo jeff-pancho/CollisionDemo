@@ -54,24 +54,45 @@ public class Polygon {
     public boolean ifCollide(Polygon p) {
         double dist = new Point2D(centerX, centerY)
                 .distance(p.getCenterX(), p.getCenterY());
-//        if(dist <= circumRad + p.getCircumRad()) {
-            generateLines();
-            p.generateLines();
+//        if(dist <= circumRad + p.getCircumRad() + 50) {
+            generateLines(p);
+//            p.generateLines();
 //        }
         return false;
     }
     
-    private void generateLines() {
-        double axisSize = 300;
+    /**
+     * I am so sorry.
+     */
+    private void generateLines(Polygon p) {
+        double axisSize = 600;
         double axisDist = 400;
         for(int i = 0; i < sides; i++) {
             Point2D p1 = new Point2D(xPts[i], yPts[i]);
             Point2D p2 = new Point2D(xPts[(i + 1) % sides], yPts[(i + 1) % sides]);
-            Point2D p3 = p2.add(p1.subtract(p2).normalize().multiply(axisDist));
+            //vector that extends past the side
+            Point2D thing = p1.subtract(p2).normalize();
+            
+            Point2D p3 = p2.add(thing.multiply(axisDist));
             //vector perpendicular to p1 -> p2
             Point2D p4 = new Point2D(p1.getY() - p3.getY(), p3.getX() - p1.getX());
+            //drawing the axis
             lines.add(new Line(p3.add(p4.normalize().multiply(-axisSize))
                     , p3.add(p4.normalize().multiply(axisSize))));
+//            lines.add(new Line(new Point2D(0, 0), p4.multiply(2)));
+            
+            //projection = a dot b^ (unit vector of b)
+            p4.normalize(); // unit vector of b
+            for(int j = 0; j < sides; j++) {
+                Point2D p10 = new Point2D(xPts[j], yPts[j]);
+                Point2D p11 = p10.add(thing.multiply(1000));
+                lines.add(new Line(p10, p11));
+            }
+            for(int j = 0; j < p.getSides(); j++) {
+                Point2D p10 = new Point2D(p.getXPts()[j], p.getYPts()[j]);
+                Point2D p11 = p10.add(thing.multiply(1000));
+                lines.add(new Line(p10, p11));
+            }
         }
     }
     
@@ -103,5 +124,9 @@ public class Polygon {
     
     public double getCircumRad() {
         return this.circumRad;
+    }
+    
+    public int getSides() {
+        return this.sides;
     }
 }
