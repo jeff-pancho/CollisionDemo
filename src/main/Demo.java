@@ -12,8 +12,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 public class Demo extends Application {
-    public static final int WIDTH = 1280;
-    public static final int HEIGHT = 960;
+//    public static final int WIDTH = 1280;
+//    public static final int HEIGHT = 960;
+    public static final int WIDTH = 800;
+    public static final int HEIGHT = 600;
     Canvas canvas;
     GraphicsContext gc;
     Group root;
@@ -58,7 +60,6 @@ public class Demo extends Application {
                 selectedPoly = p;
                 xOffset = mouseX - p.getCenterX();
                 yOffset = mouseY - p.getCenterY();
-                System.out.println("clicky");
             }
         }
     }
@@ -77,9 +78,7 @@ public class Demo extends Application {
     
     private void releasePoly(MouseEvent e) {
         selectedPoly = null;
-        System.out.println("RELEASE");
         for(Polygon p : polys) {
-            System.out.println("DELETe");
             p.deleteLines();
             renderPolys();
         }
