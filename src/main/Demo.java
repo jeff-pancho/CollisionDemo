@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class Demo extends Application {
@@ -71,23 +72,21 @@ public class Demo extends Application {
             selectedPoly.setPos(mouseX - xOffset, mouseY - yOffset);
             checkForCollision();
             renderPolys();
-            for(Polygon p : polys)
-                p.deleteLines();
         }
     }
     
     private void releasePoly(MouseEvent e) {
         selectedPoly = null;
-        for(Polygon p : polys) {
-            p.deleteLines();
-            renderPolys();
-        }
+        renderPolys();
     }
     
     private boolean checkForCollision() {
         for(Polygon p : polys)
-            if(selectedPoly != p && selectedPoly.ifCollide(p))
+            if(selectedPoly != p && selectedPoly.ifCollide(p)) {
+                gc.setStroke(Color.BLUE);
                 return true;
+            }
+        gc.setStroke(Color.BLACK);
         return false;
     }
     

@@ -37,7 +37,7 @@ public class Polygon {
     }
     
     public void render(GraphicsContext gc) {
-        gc.setStroke(Color.BLACK);
+//        gc.setStroke(Color.BLACK);
         gc.strokePolygon(xPts, yPts, xPts.length);
         
         gc.setStroke(Color.RED);
@@ -54,35 +54,40 @@ public class Polygon {
     public boolean ifCollide(Polygon p) {
         double dist = new Point2D(centerX, centerY)
                 .distance(p.getCenterX(), p.getCenterY());
-        if(dist <= circumRad + p.getCircumRad() + 50) {
+//        if(dist <= circumRad + p.getCircumRad() + 50) {
             for(int i = 0; i < sides; i++) {
                 Point2D p1 = new Point2D(xPts[i], yPts[i]);
                 Point2D p2 = new Point2D(xPts[(i + 1) % sides]
                         , yPts[(i + 1) % sides]);
                 Point2D axis = new Point2D(p1.getY() - p2.getY()
                         , p2.getX() - p1.getX()).normalize();
-                double[] dots = new double[sides];
+                
+                double[] dots1 = new double[sides];
                 for(int j = 0; j < sides; j++) {
-                    Point2D vector = new Point2D(xPts[i], yPts[i]);
-                    dots[j] = vector.dotProduct(axis);
+                    Point2D point = new Point2D(xPts[j], yPts[j]);
+                    dots1[j] = point.dotProduct(axis);
                 }
-                double min1 = min(dots);
-                double max1 = max(dots);
-                dots = new double[p.getSides()];
+                double min1 = min(dots1);
+                double max1 = max(dots1);
+                
+                double[] dots2 = new double[p.getSides()];
                 for(int j = 0; j < p.getSides(); j++) {
-                    Point2D vector = new Point2D(p.getXPts()[i], p.getYPts()[i]);
-                    dots[j] = vector.dotProduct(axis);
+                    Point2D point = new Point2D(p.getXPts()[j]
+                            , p.getYPts()[j]);
+                    dots2[j] = point.dotProduct(axis);
                 }
-                double min2 = min(dots);
-                double max2 = max(dots);
-                System.out.println(i + ". " + min1 + " " + max1 + " " + min2 + " " + max2);
-                if(!(min1 >= min2 && min1 <= max2 ) && !(max1 >= min2 && max1 <= max2))
+                double min2 = min(dots2);
+                double max2 = max(dots2);
+                
+//                System.out.println(i + ". " + min1 + " " + max1 + " " + min2 + " " + max2);
+                if(!(min1 < max2 && min2 < max1))
                     return false;
             }
-            System.out.println("WHAT THE FUCK");
+            System.out.println("OMG IT COLLIDES");
             return true;
-        }
-        return false;
+//        }
+//        System.out.println("DOZNT COLLIDE");
+//        return false;
     }
     
     private double min(double[] arr) {
@@ -103,44 +108,6 @@ public class Polygon {
         return max;
     }
     
-    /**
-     * I am so sorry.
-     */
-//    private void generateLines(Polygon p) {
-//        double axisSize = 600;
-//        double axisDist = 400;
-//        for(int i = 0; i < sides; i++) {
-//            Point2D p1 = new Point2D(xPts[i], yPts[i]);
-//            Point2D p2 = new Point2D(xPts[(i + 1) % sides], yPts[(i + 1) % sides]);
-//            //vector that extends past the side
-//            Point2D thing = p1.subtract(p2).normalize();
-//            
-//            Point2D p3 = p2.add(thing.multiply(axisDist));
-//            //vector perpendicular to p1 -> p2
-//            Point2D p4 = new Point2D(p1.getY() - p3.getY(), p3.getX() - p1.getX()).normalize();
-//            
-//            //drawing the axis
-////            lines.add(new Line(p3.add(p4.normalize().multiply(-axisSize))
-////                    , p3.add(p4.normalize().multiply(axisSize))));
-////            lines.add(new Line(new Point2D(0, 0), p4.multiply(2)));
-//            
-//            //projection = a dot b^ (unit vector of b)
-////            p4.normalize(); // unit vector of b
-//            
-//            for(int j = 0; j < sides; j++) {
-//                Point2D p10 = new Point2D(xPts[j], yPts[j]);
-//                double dot = p10.dotProduct(p4);
-//            }
-//            for(int j = 0; j < p.getSides(); j++) {
-//                Point2D p10 = new Point2D(p.getXPts()[j], p.getYPts()[j]);
-//                double dot = p10.dotProduct(thing);
-//            }
-//        }
-//    }
-    
-    public void deleteLines() {
-        lines.clear();
-    }
     
     public void setPos(double x, double y) {
         this.centerX = x;
