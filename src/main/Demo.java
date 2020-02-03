@@ -3,6 +3,7 @@ package main;
 import java.util.ArrayList;
 
 import javafx.application.Application;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -11,8 +12,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 public class Demo extends Application {
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 600;
+    public static final int WIDTH = 1280;
+    public static final int HEIGHT = 960;
     Canvas canvas;
     GraphicsContext gc;
     Group root;
@@ -33,7 +34,7 @@ public class Demo extends Application {
         
         polys.add(new Polygon(200, 300, 5, 100));
         polys.add(new Polygon(400, 300, 3, 75));
-        polys.add(new Polygon(600, 300, 4, 50));
+//        polys.add(new Polygon(600, 300, 4, 50));
         
         renderPolys();
         
@@ -46,32 +47,49 @@ public class Demo extends Application {
         stage.show();
     }
     
-    public void selectPoly(MouseEvent e) {
+    private void selectPoly(MouseEvent e) {
         mouseX = e.getSceneX();
         mouseY = e.getSceneY();
         
         for(Polygon p : polys) {
-            double dist = Math.sqrt(Math.pow(mouseX - p.getCenterX(), 2) 
-                    + Math.pow(mouseY - p.getCenterY(), 2));
+            double dist = new Point2D(mouseX, mouseY)
+                    .distance(p.getCenterX(), p.getCenterY());
             if(dist <= p.getCircumRad()) {
                 selectedPoly = p;
                 xOffset = mouseX - p.getCenterX();
                 yOffset = mouseY - p.getCenterY();
+                System.out.println("clicky");
             }
         }
     }
     
-    public void dragPoly(MouseEvent e) {
+    private void dragPoly(MouseEvent e) {
         if(selectedPoly != null) {
             mouseX = e.getSceneX();
             mouseY = e.getSceneY();
             selectedPoly.setPos(mouseX - xOffset, mouseY - yOffset);
+            checkForCollision();
             renderPolys();
+            for(Polygon p : polys)
+                p.deleteLines();
         }
     }
     
     private void releasePoly(MouseEvent e) {
         selectedPoly = null;
+        System.out.println("RELEASE");
+        for(Polygon p : polys) {
+            System.out.println("DELETe");
+            p.deleteLines();
+            renderPolys();
+        }
+    }
+    
+    private boolean checkForCollision() {
+        for(Polygon p : polys)
+            if(selectedPoly != p && selectedPoly.ifCollide(p))
+                return true;
+        return false;
     }
     
     private void renderPolys() {
