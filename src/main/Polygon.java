@@ -51,43 +51,52 @@ public class Polygon {
             l.render(gc);
     }
     
+    private Point2D vector(Point2D pt1, Point2D pt2) {
+        return pt1.subtract(pt2).normalize();
+    }
+    
+    private Point2D normalVector(Point2D vector) {
+        return new Point2D(-vector.getY(), vector.getX()).normalize();
+    }
+    
     public boolean ifCollide(Polygon p) {
         double dist = new Point2D(centerX, centerY)
                 .distance(p.getCenterX(), p.getCenterY());
-//        if(dist <= circumRad + p.getCircumRad() + 50) {
+        if(dist <= circumRad + p.getCircumRad() + 100) {
             for(int i = 0; i < sides; i++) {
-                Point2D p1 = new Point2D(xPts[i], yPts[i]);
-                Point2D p2 = new Point2D(xPts[(i + 1) % sides]
-                        , yPts[(i + 1) % sides]);
-                Point2D axis = new Point2D(p1.getY() - p2.getY()
-                        , p2.getX() - p1.getX()).normalize();
+                Point2D pointStart = new Point2D(xPts[i], yPts[i]);
+                Point2D pointEnd = new Point2D(xPts[(i + 1) % sides], yPts[(i + 1) % sides]);
+                Point2D vector = vector(pointStart, pointEnd);
+                Point2D axis = normalVector(vector);
                 
-                double[] dots1 = new double[sides];
+//                System.out.println(vector.getX() + " " + vector.getY() + " " 
+//                        + axis.getX() + " " + axis.getY()); 
+                
+                double[] dot1 = new double[sides];
                 for(int j = 0; j < sides; j++) {
                     Point2D point = new Point2D(xPts[j], yPts[j]);
-                    dots1[j] = point.dotProduct(axis);
+                    dot1[j] = point.dotProduct(axis);
                 }
-                double min1 = min(dots1);
-                double max1 = max(dots1);
                 
-                double[] dots2 = new double[p.getSides()];
+                double min1 = min(dot1);
+                double max1 = max(dot1);
+                
+                double[] dot2 = new double[p.getSides()];
                 for(int j = 0; j < p.getSides(); j++) {
-                    Point2D point = new Point2D(p.getXPts()[j]
-                            , p.getYPts()[j]);
-                    dots2[j] = point.dotProduct(axis);
+                    Point2D point = new Point2D(p.getXPts()[j], p.getYPts()[j]);
+                    dot2[j] = point.dotProduct(axis);
                 }
-                double min2 = min(dots2);
-                double max2 = max(dots2);
                 
-//                System.out.println(i + ". " + min1 + " " + max1 + " " + min2 + " " + max2);
-                if(!(min1 < max2 && min2 < max1))
+                double min2 = min(dot2);
+                double max2 = max(dot2);
+                
+                if(!(min1 < max2 && max1 < min1)) {
                     return false;
+                }
             }
-            System.out.println("OMG IT COLLIDES");
             return true;
-//        }
-//        System.out.println("DOZNT COLLIDE");
-//        return false;
+        }
+        return false;
     }
     
     private double min(double[] arr) {
