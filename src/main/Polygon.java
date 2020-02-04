@@ -63,40 +63,38 @@ public class Polygon {
         double dist = new Point2D(centerX, centerY)
                 .distance(p.getCenterX(), p.getCenterY());
         if(dist <= circumRad + p.getCircumRad() + 100) {
-            for(int i = 0; i < sides; i++) {
-                Point2D pointStart = new Point2D(xPts[i], yPts[i]);
-                Point2D pointEnd = new Point2D(xPts[(i + 1) % sides], yPts[(i + 1) % sides]);
-                Point2D vector = vector(pointStart, pointEnd);
-                Point2D axis = normalVector(vector);
-                
-//                System.out.println(vector.getX() + " " + vector.getY() + " " 
-//                        + axis.getX() + " " + axis.getY()); 
-                
-                double[] dot1 = new double[sides];
-                for(int j = 0; j < sides; j++) {
-                    Point2D point = new Point2D(xPts[j], yPts[j]);
-                    dot1[j] = point.dotProduct(axis);
-                }
-                
-                double min1 = min(dot1);
-                double max1 = max(dot1);
-                
-                double[] dot2 = new double[p.getSides()];
-                for(int j = 0; j < p.getSides(); j++) {
-                    Point2D point = new Point2D(p.getXPts()[j], p.getYPts()[j]);
-                    dot2[j] = point.dotProduct(axis);
-                }
-                
-                double min2 = min(dot2);
-                double max2 = max(dot2);
-                
-                if(!(min1 < max2 && max1 < min1)) {
+            ArrayList<Point2D> axes = new ArrayList<Point2D>();
+            addAxes(axes, this);
+            addAxes(axes, p);
+            
+            for(Point2D axis : axes) {
+                Scalar s1 = project(this, axis);
+                Scalar s2 = project(p, axis);
+                if(!s1.ifOverlap(s2))
                     return false;
-                }
             }
             return true;
         }
         return false;
+    }
+    
+    private Scalar project(Polygon p, Point2D axis) {
+        double dot[] = new double[p.getSides()];
+        for(int i = 0; i < p.getSides(); i++) {
+            Point2D point = new Point2D(p.getXPts()[i], p.getYPts()[i]);
+            dot[i] = point.dotProduct(axis);
+        }
+        return new Scalar(min(dot), max(dot));
+    }
+    
+    private void addAxes(ArrayList<Point2D> arr, Polygon p) {
+        for(int i = 0; i < p.getSides(); i++) {
+            Point2D pointStart = new Point2D(p.getXPts()[i], p.getYPts()[i]);
+            Point2D pointEnd = new Point2D(p.getXPts()[(i + 1) % p.getSides()]
+                    , p.getYPts()[(i + 1) % p.getSides()]);
+            Point2D vector = vector(pointStart, pointEnd);
+            arr.add(normalVector(vector));
+        }
     }
     
     private double min(double[] arr) {
