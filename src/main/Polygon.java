@@ -15,7 +15,7 @@ public class Polygon {
     private final double circumRad;
     private double dir;
     
-    private ArrayList<Line> lines;
+    private Color activeColor;
     
     public Polygon(double centerX, double centerY, int sides, double circumRad) {
         this.centerX = centerX;
@@ -25,7 +25,8 @@ public class Polygon {
         this.yPts = new double[sides];
         this.circumRad = circumRad;
         this.dir = 0;
-        lines = new ArrayList<Line>();
+        this.activeColor = Color.BLACK;
+        
         calcPts();
     }
     
@@ -37,7 +38,7 @@ public class Polygon {
     }
     
     public void render(GraphicsContext gc) {
-//        gc.setStroke(Color.BLACK);
+        gc.setStroke(activeColor);
         gc.strokePolygon(xPts, yPts, xPts.length);
         
         gc.setStroke(Color.RED);
@@ -47,8 +48,6 @@ public class Polygon {
         gc.fillOval(centerX - 10, centerY - 10, 20, 20);
         for(int i = 0; i < sides; i++)
             gc.fillOval(xPts[i] - 3, yPts[i] - 3, 6, 6);
-        for(Line l : lines)
-            l.render(gc);
     }
     
     private Point2D vector(Point2D pt1, Point2D pt2) {
@@ -62,11 +61,12 @@ public class Polygon {
     public boolean ifCollide(Polygon p) {
         double dist = new Point2D(centerX, centerY)
                 .distance(p.getCenterX(), p.getCenterY());
-        if(dist <= circumRad + p.getCircumRad() + 100) {
+        if(dist <= circumRad + p.getCircumRad() + 25) {
             ArrayList<Point2D> axes = new ArrayList<Point2D>();
             addAxes(axes, this);
             addAxes(axes, p);
             
+            // if the scalar projections don't overlap, immediately stop
             for(Point2D axis : axes) {
                 Scalar s1 = project(this, axis);
                 Scalar s2 = project(p, axis);
@@ -120,6 +120,10 @@ public class Polygon {
         this.centerX = x;
         this.centerY = y;
         calcPts();
+    }
+    
+    public void setActiveColor(Color activeColor) {
+        this.activeColor = activeColor;
     }
     
     public double[] getXPts() {

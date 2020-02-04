@@ -37,7 +37,7 @@ public class Demo extends Application {
         
         polys.add(new Polygon(200, 300, 5, 100));
         polys.add(new Polygon(400, 300, 3, 75));
-//        polys.add(new Polygon(600, 300, 4, 50));
+        polys.add(new Polygon(600, 300, 4, 50));
         
         renderPolys();
         
@@ -83,10 +83,10 @@ public class Demo extends Application {
     private boolean checkForCollision() {
         for(Polygon p : polys)
             if(selectedPoly != p && selectedPoly.ifCollide(p)) {
-                gc.setStroke(Color.BLUE);
+                selectedPoly.setActiveColor(Color.MAGENTA);
                 return true;
             }
-        gc.setStroke(Color.BLACK);
+        selectedPoly.setActiveColor(Color.BLACK);
         return false;
     }
     
